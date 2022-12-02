@@ -15,7 +15,7 @@ int result_round(int a, int b)
         return (6 * (result != 1));
 }
 
-void no_name_yet(char* file_name)
+void find_total_coded(char* file_name)
 {
     char round[4];
     int fd;
@@ -36,7 +36,7 @@ void no_name_yet(char* file_name)
     
 }
 
-int no_name_yet_2(int input, int result)
+int find_expected(int input, int result)
 {
     if (result == 1)        // loss
         return (input - 1 + 3 * (input == 1));
@@ -46,7 +46,7 @@ int no_name_yet_2(int input, int result)
         return (input + 1 - 3 * (input == 3));
 }
 
-void no_name_yet_bonus(char* file_name)
+void find_total_encoded(char* file_name)
 {
     char round[4];
     int fd;
@@ -61,7 +61,7 @@ void no_name_yet_bonus(char* file_name)
     {
         n_1 = round[0] - 'A' + 1;
         result = round[2] - 'X' + 1;
-        n_2 = no_name_yet_2(n_1, result);
+        n_2 = find_expected(n_1, result);
         total += result_round(n_1, n_2) + n_2;
     }
     printf("%d\n", total);
@@ -71,6 +71,7 @@ void no_name_yet_bonus(char* file_name)
 
 int main()
 {
-    no_name_yet_bonus("../input.txt");
-    return (0);
+    find_total_coded("../input.txt");
+    find_total_encoded("../input.txt");
+	return (0);
 }
