@@ -4,58 +4,54 @@
 # include <fcntl.h>
 # include <stdio.h>
 
-int satoi(char *char_nbr)
+int simple_atoi(char *char_nbr)
 {
     int nbr;
     
     nbr = 0;
-    while(*char_nbr > '0' && *char_nbr < '9')
+    while(*char_nbr >= '0' && *char_nbr <= '9')
         nbr = (nbr * 10) + (*char_nbr++ - '0');
     return (nbr);
 }
 
 void check_max(int* max, int to_check)
 {
-
+    if (max[0] < to_check)
+    {
+        max[2] = max[1];
+        max[1] = max[0];
+        max[0] = to_check;
+    }
+    else if (max[1] < to_check)
+    {
+        max[2] = max[1];
+        max[1] = to_check;
+    }
+    else if (max[2] < to_check)
+        max[2] = to_check;
 }
 
-int len_line(char *str)
-{
-    int cnt;
-
-    cnt = 0;
-    while(*str++)
-        cnt++;
-    return (cnt);
-}
 void find_max_kal(char* file_name)
 {
     FILE *fp;
     char line[7];
     int total;
     int first_three[] = {0, 0, 0};
-    int max;
 
-    max = 0;
     total = 0;
     fp = fopen(file_name, "r");
-    while (fgets(line, 8, (FILE*) fp) != NULL)
+    while (fgets(line, 7, (FILE*) fp) != NULL)
     {
-        //printf("%s", line);
         if (*line != '\n')
-            total += satoi(line);
+            total += simple_atoi(line);
         else
         {
-            if (max < total)
-            {
-                max = total;
-                printf("%d\n", max);
-            }
+            check_max(first_three, total);
             total = 0;
         }
     }
     fclose(fp);
-    printf("max: %d\n", max);
+    printf("tot 3 max: %d\n", first_three[0] + first_three[1] + first_three[2]);
 }
 
 int main()
