@@ -12,6 +12,7 @@ def create_matrix(file_name):
                 else:
                     mtx[i].append(line[1:2])
             mtx[i].reverse()
+            print(mtx[i])
     return mtx
 
 
@@ -31,10 +32,21 @@ def isolate_numbers(line):
 
 def read_sequence(file_name):
     mtx = create_matrix(file_name)
+    i = 0
     for n, org_i, dst_i in get_numbers(file_name):
-        
+        # if i == 5:
+        #     return
+        # i += 1
+        print('elements to move:', n, org_i + 1, dst_i + 1)
+        # print('before src', mtx[org_i])
+        # print('before dst', mtx[dst_i])
         for j in range(n):
-            mtx[dst_i].append(mtx[org_i].pop())
+            ele_to_move = mtx[org_i][len(mtx[org_i]) - n + j]
+            mtx[dst_i].append(ele_to_move )
+            mtx[org_i].remove(ele_to_move)
+        # print('after  src', mtx[org_i])
+        # print('after  dst', mtx[dst_i])
+        # print('---')
     return [mtx[i][-1] for i in range(9)]
 
 
