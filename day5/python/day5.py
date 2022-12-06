@@ -17,9 +17,8 @@ def create_matrix(file_name):
 
 def get_numbers(file_name):
     with open(file_name, 'r') as f:
-        for line in f.readlines():
-            if line[0] == 'm':
-                yield isolate_numbers(line)
+        for cmd_line in [line for line in f.readlines() if line[0] == 'm']:
+            yield isolate_numbers(cmd_line)
 
 
 def isolate_numbers(line):
@@ -29,14 +28,18 @@ def isolate_numbers(line):
     return n, org_i, dst_i
 
 
-def read_sequence(file_name):
+def read_sequence(file_name, case):
     mtx = create_matrix(file_name)
     for n, org_i, dst_i in get_numbers(file_name):
-        
-        for j in range(n):
-            mtx[dst_i].append(mtx[org_i].pop())
-    return [mtx[i][-1] for i in range(9)]
+        if case == 2:
+            mtx[dst_i] += mtx[org_i][len(mtx[org_i]) - n:]
+            mtx[org_i] = mtx[org_i][:len(mtx[org_i]) - n]
+        else:
+            for j in range(n):
+                mtx[dst_i].append(mtx[org_i].pop())
+    return [mtx[i][-1] if len(mtx[i]) > 0 else '' for i in range(9)]
 
 
 if __name__ == "__main__":
-    print("sequence is:", read_sequence("../input.txt"))
+    print("sequence is:", read_sequence("../input.txt", 1))
+    print("sequence is:", read_sequence("../input.txt", 2))
