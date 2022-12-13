@@ -58,13 +58,15 @@ def print_snake(snake):
     for i in range(len(snake)):
         print(i, " -- ", snake[i])
     print("")
-    # for i in range(-20, 20):
-    #     for j in range(-20, 20):
-    #         if {'x': i, 'y': j} in snake:
-    #             print('x', end="")
-    #         else:
-    #             print('_|', end="")
-    #     print("")
+    for i in range(-10, 10):
+        for j in range(-10, 10):
+            if i == 0 and j == 0:
+                print('{}'.format('|s' if {'x': 0, 'y': 0} not in snake else '|O'), end="")
+            elif {'x': j, 'y': -i} in snake:
+                print('|O', end="")
+            else:
+                print("|_", end="")  # ({:^2}:{:^2})".format(i if i > 0 else -i, j if j > 0 else -j), end="")
+        print("")
 
 def move_snake_bk(snake, istruction):
     coor, amount = istruction
@@ -97,6 +99,7 @@ def move_snake_bk(snake, istruction):
     print_snake(snake)
 
 def move_snake_bk_bk(snake, istruction):
+    print("\t\t\tcoor:", istruction[0], "amount:", istruction[1])
     coor, amount = istruction
     neg = 1
     if amount < 0:
@@ -113,19 +116,20 @@ def move_snake_bk_bk(snake, istruction):
                 single_move(snake[i], current_move)
                 # print(" -- fix move", snake[i], end="")
                 edges = check_edges(snake[i - 1], snake[i])
-                if edges and not edge_move:
+                if edges:  # and not edge_move:
                     # print(" -- move diag", end="")
                     if coor == 'x':
                         edge_move = ['y', edges[0]]
                     elif coor == 'y':
                         edge_move =  ['x', edges[1]]
-                if edge_move:
                     single_move(snake[i], edge_move)
+                # if edge_move:
+                #     single_move(snake[i], edge_move)
                     # print(snake[i])
             else:
                 # print("\nbreak!")
                 break
-        # print_snake(snake)
+        print_snake(snake)
 
 def single_move(snake, istruction):
     coor = istruction[0]
@@ -139,8 +143,8 @@ def count_tail(file_name):
     for i in range(10):
         snake.append({'x': 0, 'y': 0})
 
-    single_past_t_pos = [[0, 0]]
-    snake_past_t_pos = [[0, 0]]
+    single_past_t_pos = [{'x': 0, 'y': 0}]
+    snake_past_t_pos = [{'x': 0, 'y': 0}]
     istructions = read_file(file_name)
     for istruction in istructions:
         move_rope(pos_h, pos_t, istruction)
