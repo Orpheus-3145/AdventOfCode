@@ -14,7 +14,7 @@ def read_file(file_name):
             moves.append(parse_line(line))
         return (moves)
    
-def check_touch(pos_h, pos_t):
+def touching(pos_h, pos_t):
     if pos_h == pos_t or check_edges(pos_h, pos_t):
         return True
     elif pos_t['x'] == pos_h['x'] and pos_t['y'] in [pos_h['y'] - 1, pos_h['y'] + 1]:
@@ -36,16 +36,16 @@ def check_edges(pos_h, pos_t):
     else:
         return []
 
-def move_rope(pos_h, pos_t, istruction, past_t_pos):
-    coor = istruction[0]
-    amount = istruction[1]
+def move_rope(pos_h, pos_t, istruction):
+    coor, amount = istruction
     reverse = 1
     if amount < 0:
         reverse = -1
         amount *= -1
     for i in range(0, amount):
         pos_h[coor] += 1 * reverse
-        if not check_touch(pos_h, pos_t):
+        current = pos_h
+        if not touching(pos_h, pos_t):
             pos_t[coor] += 1 * reverse
             edges = check_edges(pos_h, pos_t)
             if edges:
@@ -53,19 +53,121 @@ def move_rope(pos_h, pos_t, istruction, past_t_pos):
                     pos_t['y'] += edges[0]
                 elif coor == 'y':
                     pos_t['x'] += edges[1]
-            if [pos_t['x'], pos_t['y']] not in past_t_pos:
-                past_t_pos.append([pos_t['x'], pos_t['y']])
+
+def print_snake(snake):
+    for i in range(len(snake)):
+        print(i, " -- ", snake[i])
+    print("")
+    # for i in range(-20, 20):
+    #     for j in range(-20, 20):
+    #         if {'x': i, 'y': j} in snake:
+    #             print('x', end="")
+    #         else:
+    #             print('_|', end="")
+    #     print("")
+
+def move_snake_bk(snake, istruction):
+    coor, amount = istruction
+    neg = 1
+    if amount < 0:
+        neg = -1
+        amount *= -1
+    for i in range(0, amount):
+        snake[0][coor] += 1 * neg
+        for i in range(1, 10):
+            current = snake[i - 1]
+            print("\t--", current, snake[i], end="")
+            if not touching(current, snake[i]):
+                print(" -- no touch", end="")
+                snake[i][coor] += 1 * neg
+                print(" -- fix move", snake[i], end="")
+                edges = check_edges(current, snake[i])
+                if edges:
+                    print(" -- move diag", end="")
+                    if coor == 'x':
+                        snake[i]['y'] += edges[0]
+                    elif coor == 'y':
+                        snake[i]['x'] += edges[1]
+                    print(snake[i])
+                else:
+                    print("")
+            else:
+                print("\nbreak!")
+                break
+    print_snake(snake)
+
+def move_snake_bk_bk(snake, istruction):
+    coor, amount = istruction
+    neg = 1
+    if amount < 0:
+        neg = -1
+        amount *= -1
+    for i in range(0, amount):
+        current_move = [coor, neg]
+        single_move(snake[0], current_move)
+        for i in range(1, 10):
+            print("\t--", snake[i - 1], snake[i], end="")
+            if not touching(snake[i - 1], snake[i]):
+                print(" -- no touch", end="")
+                single_move(snake[i], current_move)
+                print(" -- fix move", snake[i], end="")
+                edges = check_edges(snake[i - 1], snake[i])
+                if edges:
+                    print(" -- move diag", end="")
+                    if coor == 'x':
+                        current_move = ['y', edges[0]]
+                    elif coor == 'y':
+                        current_move = ['x', edges[1]]
+                    if i > 1:
+                        current_move[0] = 'x' if current_move[0] == 'y' else 'y'
+                    single_move(snake[i], current_move)
+                    print(snake[i])
+                else:
+                    print("")
+            else:
+                print("\nbreak!")
+                break
+        print_snake(snake)
+
+def single_move(snake, istruction):
+    coor = istruction[0]
+    dir = istruction[1]
+    snake[coor] += dir
+
+def move_snake_bk_bk(head, body, istruction):
+    coor, amount = istruction
+    neg = 1
+    head = {'x': 0, 'y': 0}
+    if amount < 0:
+        neg = -1
+        amount *= -1
+    for i in range(0, amount):
+        for i in range(1, 10):
+            snake[i][coor] += 1 * neg
+            if i > 0 and not touching(snake[i - 1], snake[i]):
+
+
 
 def count_tail(file_name):
     pos_h = {'x': 0, 'y': 0}
     pos_t = {'x': 0, 'y': 0}
-    past_t_pos = [[pos_h['x'], pos_h['y']]]
+    snake = []
+    for i in range(10):
+        snake.append({'x': 0, 'y': 0})
+
+    single_past_t_pos = [[0, 0]]
+    snake_past_t_pos = [[0, 0]]
     istructions = read_file(file_name)
     for istruction in istructions:
-        move_rope(pos_h, pos_t, istruction, past_t_pos)
-    return (len(past_t_pos))
+        move_rope(pos_h, pos_t, istruction)
+        move_snake(snake, istruction)
+        if [pos_t['x'], pos_t['y']] not in single_past_t_pos:
+            single_past_t_pos.append([pos_t['x'], pos_t['y']])
+        if [snake[9]['x'], snake[9]['y']] not in snake_past_t_pos:     # passare l'elemento come dict invece che lista
+            snake_past_t_pos.append([snake[9]['x'], snake[9]['y']])
+        print("\n\n")
+    return len(single_past_t_pos), len(snake_past_t_pos)
         
-        
-
 if __name__ == "__main__":
-    print("tail tiles:", count_tail("..\\input.txt"))
+    single, snake = count_tail("..\\input2.txt")
+    print("tail position: {}, snake tail position: {}".format(single, snake))
