@@ -11,10 +11,10 @@ class MonkeyBreed():
             if id == monkey.id:
                 return monkey
 
-    def play_round(self, times):
+    def play_round(self, times, worry_level):
         for i in range(times):
             for monkey in self.monkeys:
-                for id, new_value in monkey.play_with_items():
+                for id, new_value in monkey.play_with_items(worry_level):
                     self.get_monkey(id).add_item(new_value)
                     monkey.no_pass += 1
                 monkey.items.clear()
@@ -73,11 +73,6 @@ class Monkey():
                 self.operation = lambda worry : worry + worry
             else:
                 self.operation = lambda worry : worry + value
-        elif ops[1] == '-':
-            if same:
-                self.operation = lambda worry : worry - worry
-            else:
-                self.operation = lambda worry : worry - value
         elif ops[1] == '*':
             if same:
                 self.operation = lambda worry : worry * worry
@@ -90,17 +85,20 @@ class Monkey():
         else:
             return self.false_monkey, value
 
-    def play_with_items(self):
+    def play_with_items(self, worry_level):
         for item in self.items:
-            new_value = self.operation(item) // 3
+            new_value = self.operation(item) // worry_level
             yield self.check(new_value)
 
 
-def fetch_items(file_name, times):
+def fetch_items(file_name, times, worry_level):
     monkeys = MonkeyBreed()
     monkeys.parse_monkeys(file_name)
-    monkeys.play_round(times)
+    monkeys.play_round(times, worry_level)
     return (monkeys.get_2_worst_monkeys())
 
 if __name__ == "__main__":
-    print("worst 2 monkeys: {}".format(fetch_items("..\\input.txt", 20)))
+    rounds, worry_div = 20, 3
+    print("worst 2 monkeys, in {} rounds, worry level={}: {}".format(rounds, worry_div, fetch_items("..\\input.txt", rounds, worry_div)))
+    rounds, worry_div = 10000, 1
+    print("worst 2 monkeys, in {} rounds, worry level={}: {}".format(rounds, worry_div, fetch_items("..\\input2.txt", rounds, worry_div)))
